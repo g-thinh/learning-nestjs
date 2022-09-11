@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
 
-export const authConfig = registerAs('db', () => ({
+export const dbConfig = registerAs('db', () => ({
   url: process.env.DATABASE_URL,
 }));

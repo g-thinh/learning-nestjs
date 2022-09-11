@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { authConfig } from './config/auth.config';
+import { dbConfig } from './config/db.config';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
@@ -12,7 +13,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     UsersModule,
     ConfigModule.forRoot({
-      load: [authConfig],
+      load: [authConfig, dbConfig],
     }),
     PrismaModule,
   ],
