@@ -3,6 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
+export type JwtPayload = {
+  sub: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+  refreshToken?: string;
+};
+
+//basically, this will destroy the token and create another
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(configService: ConfigService) {
@@ -13,9 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  // TODO: Update payload type
-  // we can return more information here using the userService
-  async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username, foo: 'bar' };
+  async validate(payload: JwtPayload): Promise<JwtPayload> {
+    return payload;
   }
 }

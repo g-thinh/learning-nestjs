@@ -5,4 +5,5 @@ import { registerAs } from '@nestjs/config';
 // with dot notation
 export const authConfig = registerAs('auth', () => ({
   secret: process.env.JWT_SECRET,
+  rt_secret: process.env.RT_SECRET,
 }));
