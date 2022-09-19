@@ -18,6 +18,7 @@ export class LoggingInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
+    const timeBeforeRouteHandle = Date.now();
     const request = context.switchToHttp().getRequest();
     const userAgent = request.get('user-agent') || '';
     const { ip, method, path: url } = request;
@@ -28,12 +29,10 @@ export class LoggingInterceptor implements NestInterceptor {
         context.getClass().name
       } ${context.getHandler().name}`,
     );
-
     this.logger.log(
       `${userId ? 'Authenticated' : 'Un-authenticated'} userId: ${userId}`,
     );
 
-    const timeBeforeRouteHandle = Date.now();
     return next.handle().pipe(
       tap(() => {
         const response = context.switchToHttp().getResponse();
