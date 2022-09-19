@@ -9,6 +9,7 @@ import { dbConfig } from './config/db.config';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { PrismaModule } from './prisma/prisma.module';
+import { RequestService } from './request.service';
 import { UsersModule } from './users/users.module';
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UsersModule } from './users/users.module';
   controllers: [AppController],
   providers: [
     AppService,
+    RequestService,
     {
       provide: APP_INTERCEPTOR,
       scope: Scope.REQUEST,

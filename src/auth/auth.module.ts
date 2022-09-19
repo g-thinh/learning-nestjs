@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { RequestService } from 'src/request.service';
 import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -11,7 +12,13 @@ import { LocalStrategy } from './strategies/local.strategy';
 const JWT_EXPIRATION_IN_SECONDS = 60 * 60;
 
 @Module({
-  providers: [AuthService, LocalStrategy, JwtStrategy, RtStrategy],
+  providers: [
+    AuthService,
+    RequestService,
+    LocalStrategy,
+    JwtStrategy,
+    RtStrategy,
+  ],
   imports: [
     UsersModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
