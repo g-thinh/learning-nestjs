@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User, UsersService } from 'src/users/users.service';
+import { PrismaService } from 'src/providers/prisma/prisma.service';
+import { User, UsersService } from 'src/providers/users/users.service';
 import { AuthDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types';

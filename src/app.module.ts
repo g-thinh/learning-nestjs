@@ -6,11 +6,12 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { authConfig } from './config/auth.config';
 import { dbConfig } from './config/db.config';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
-import { LoggingInterceptor } from './interceptors/logging.interceptor';
-import { PrismaModule } from './prisma/prisma.module';
-import { RequestService } from './request.service';
-import { UsersModule } from './users/users.module';
+import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { PrismaModule } from './providers/prisma/prisma.module';
+import { RequestService } from './providers/request.service';
+import { UsersModule } from './providers/users/users.module';
+
 @Module({
   imports: [
     AuthModule,
