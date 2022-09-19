@@ -11,6 +11,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { PrismaModule } from './providers/prisma/prisma.module';
 import { RequestService } from './providers/request.service';
 import { UsersModule } from './providers/users/users.module';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -20,6 +21,21 @@ import { UsersModule } from './providers/users/users.module';
       load: [authConfig, dbConfig],
     }),
     PrismaModule,
+    LoggerModule.forRoot({
+      pinoHttp: {
+        customProps: () => ({
+          context: 'HTTP',
+        }),
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            singleLine: true,
+            colorize: true,
+            levelFirst: true,
+          },
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [
