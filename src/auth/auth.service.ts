@@ -77,11 +77,11 @@ export class AuthService {
   }
 
   async signupLocal(authDto: AuthDto): Promise<Tokens> {
-    const hash = await this.hashData(authDto.password);
+    const hashedPassword = await this.hashData(authDto.password);
     const newUser = await this.prisma.user.create({
       data: {
         email: authDto.email,
-        hash,
+        hashedPassword,
       },
     });
 
@@ -104,7 +104,10 @@ export class AuthService {
       throw new ForbiddenException('Access Denied.');
     }
 
-    const passwordMatches = await bcrypt.compare(authDto.password, user.hash);
+    const passwordMatches = await bcrypt.compare(
+      authDto.password,
+      user.hashedPassword,
+    );
     if (!passwordMatches) {
       throw new ForbiddenException('Access Denied.');
     }
