@@ -11,7 +11,6 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { authConfig } from './config/auth.config';
 import { dbConfig } from './config/db.config';
 import { mikroOrmConfigAsync } from './database/mikro-orm.config';
-import { PrismaModule } from './providers/prisma/prisma.module';
 import { RequestService } from './providers/request.service';
 import { UsersModule } from './providers/users/users.module';
 import { UsersController } from './providers/users/users.controller';
@@ -23,7 +22,6 @@ import { UsersController } from './providers/users/users.controller';
     ConfigModule.forRoot({
       load: [authConfig, dbConfig],
     }),
-    PrismaModule,
     MikroOrmModule.forRootAsync(mikroOrmConfigAsync),
     LoggerModule.forRoot({
       pinoHttp: {
