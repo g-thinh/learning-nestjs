@@ -1,11 +1,10 @@
 import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { IsAlphanumeric, IsDate, IsEmail, IsNotEmpty } from 'class-validator';
-import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class User {
-  @PrimaryKey()
-  id: string = uuidv4();
+  @PrimaryKey({ autoincrement: true })
+  id!: number;
 
   @Property()
   @IsDate()

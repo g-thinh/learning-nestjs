@@ -1,14 +1,14 @@
 {
   "name": "learning-nestjs",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "A repo created for learning about the NestJS framework and its ecosystem.",
+  "author": "Gia Thinh Nguyen",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT License",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prettier": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -23,7 +23,7 @@
     "prisma:studio": "npx prisma studio",
     "migration:up": "mikro-orm migration:up",
     "migration:down": "mikro-orm migration:down",
-    "migration:create": "mikro-orm migration:create"
+    "migration:create": "mikro-orm migration:create && prettier -w src/database/migrations"
   },
   "dependencies": {
     "@mikro-orm/core": "^5.4.2",
@@ -48,8 +48,7 @@
     "pino-pretty": "^9.1.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0",
-    "uuid": "^9.0.0"
+    "rxjs": "^7.2.0"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^5.4.2",

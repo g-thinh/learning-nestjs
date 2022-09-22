@@ -5,12 +5,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
           "nullable": false,
-          "mappedType": "string"
+          "mappedType": "integer"
         },
         "created_at": {
           "name": "created_at",
@@ -64,9 +64,7 @@
       "indexes": [
         {
           "keyName": "PRIMARY",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "primary": true,
           "unique": true
