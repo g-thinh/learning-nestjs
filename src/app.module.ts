@@ -26,6 +26,7 @@ import { LoggerModule } from 'nestjs-pino';
         customProps: () => ({
           context: 'HTTP',
         }),
+        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
         transport: {
           target: 'pino-pretty',
           options: {
