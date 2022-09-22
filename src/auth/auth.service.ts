@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { User, UsersService } from 'src/providers/users/users.service';
+import { UsersService } from 'src/providers/users/users.service';
 import { AuthDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types';
+import { User } from 'src/providers/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +13,6 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-    private prisma: PrismaService,
   ) {}
 
   hashData(data: string) {
@@ -53,22 +52,23 @@ export class AuthService {
   }
 
   async validateUser(
-    username: string,
+    email: string,
     password: string,
-  ): Promise<Omit<User, 'password'> | null> {
-    const user = await this.usersService.findOne(username);
+  ): Promise<Omit<User, 'hashedRt' | 'hashedPassword'> | null> {
+    const user = await this.usersService.findByEmail(email);
 
-    // TODO: use bcrypt to hash password
-    if (user && user.password === password) {
+    const passwordMatches = bcrypt.compare(password, user.hashedPassword);
+
+    if (user && passwordMatches) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
+      const { hashedPassword, hashedRt, ...result } = user;
       return result;
     }
     return null;
   }
 
   async login(user: User) {
-    const payload = { username: user.username, sub: user.userId };
+    const payload = { username: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload, {
         secret: this.configService.get<string>('auth.secret'),
@@ -77,14 +77,7 @@ export class AuthService {
   }
 
   async signupLocal(authDto: AuthDto): Promise<Tokens> {
-    const hashedPassword = await this.hashData(authDto.password);
-    const newUser = await this.prisma.user.create({
-      data: {
-        email: authDto.email,
-        hashedPassword,
-      },
-    });
-
+    const newUser = await this.usersService.create(authDto);
     const tokens = await this.getTokens(newUser.id, newUser.email);
 
     //store the refresh token in the DB
@@ -94,11 +87,7 @@ export class AuthService {
   }
 
   async signinLocal(authDto: AuthDto): Promise<Tokens> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: authDto.email,
-      },
-    });
+    const user = await this.usersService.findByEmail(authDto.email);
 
     if (!user) {
       throw new ForbiddenException('Access Denied.');
@@ -119,25 +108,13 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    await this.prisma.user.updateMany({
-      where: {
-        id: userId,
-        hashedRt: {
-          not: null,
-        },
-      },
-      data: {
-        hashedRt: null,
-      },
+    await this.usersService.update(userId, {
+      hashedRt: null,
     });
   }
 
   async refreshTokens(userId: number, rt: string): Promise<Tokens> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const user = await this.usersService.findByUserId(userId);
 
     if (!user || !user.hashedRt) {
       throw new ForbiddenException('Access Denied.');
@@ -151,19 +128,11 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refresh_token);
-
     return tokens;
   }
 
   async updateRtHash(userId: number, rt: string) {
     const hash = await this.hashData(rt);
-    await this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        hashedRt: hash,
-      },
-    });
+    await this.usersService.update(userId, { hashedRt: hash });
   }
 }

@@ -3,7 +3,7 @@ import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { LocalAuthGuard } from './common/guards/local-auth.guard';
-import { User } from './providers/users/users.service';
+import { User } from './providers/users/entities/user.entity';
 
 @Controller()
 export class AppController {
