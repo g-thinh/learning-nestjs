@@ -6,6 +6,12 @@ generator client {
   previewFeatures = ["referentialIntegrity"]
 }
 
+generator prismaClassGenerator {
+    provider = "prisma-class-generator"
+    output = "./generated-classes"
+    dryRun = false
+}
+
 
 datasource db {
   provider = "mysql"
