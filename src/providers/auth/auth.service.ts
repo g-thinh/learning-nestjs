@@ -1,10 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/providers/prisma/prisma.service';
-import { User, UsersService } from 'src/providers/users/users.service';
-import { AuthDto } from './dto';
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/providers/prisma/prisma.service';
+import { UsersService } from 'src/providers/users/users.service';
+import { AuthDto } from './dto';
 import { Tokens } from './types';
 
 @Injectable()
@@ -52,23 +53,21 @@ export class AuthService {
     };
   }
 
-  async validateUser(
-    username: string,
-    password: string,
-  ): Promise<Omit<User, 'password'> | null> {
-    const user = await this.usersService.findOne(username);
+  async validateUser(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
 
-    // TODO: use bcrypt to hash password
-    if (user && user.password === password) {
+    const passwordMatches = bcrypt.compare(user.hashedPassword, password);
+
+    if (user && passwordMatches) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
+      const { hashedPassword, hashedRt, ...result } = user;
       return result;
     }
     return null;
   }
 
   async login(user: User) {
-    const payload = { username: user.username, sub: user.userId };
+    const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload, {
         secret: this.configService.get<string>('auth.secret'),

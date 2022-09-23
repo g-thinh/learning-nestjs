@@ -1,10 +1,9 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { User } from 'src/prisma/generated-classes/user';
 
-export class AuthDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
+export class AuthDto extends PickType(User, ['email']) {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   password: string;
