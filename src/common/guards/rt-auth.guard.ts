@@ -1,6 +1,6 @@
 import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { JwtPayload } from 'src/auth/strategies';
+import { JwtPayload } from 'src/providers/auth/strategies';
 
 @Injectable()
 export class RtAuthGuard extends AuthGuard('jwt-refresh') {

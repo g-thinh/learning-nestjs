@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { JwtPayload } from 'src/auth/strategies/jwt.strategy';
+import { JwtPayload } from 'src/providers/auth/strategies/jwt.strategy';
 
 type JwtPayloadKey = keyof JwtPayload;
 

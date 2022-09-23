@@ -10,8 +10,8 @@ import {
 import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RtAuthGuard } from '../common/guards/rt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RtAuthGuard } from '../../common/guards/rt-auth.guard';
 import { Tokens } from './types';
 
 @Controller('auth')
