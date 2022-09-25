@@ -1,6 +1,4 @@
-import { OmitType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
+import { PartialType } from '@nestjs/swagger';
+import { User } from 'src/prisma/generated-classes/user';
 
-export class UpdateUserDto extends OmitType(CreateUserDto, [
-  'hashedRt',
-] as const) {}
+export class UpdateUserDto extends PartialType(User) {}
