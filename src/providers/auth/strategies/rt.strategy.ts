@@ -1,24 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JwtPayload } from './jwt.strategy';
+import { JwtPayload } from 'src/providers/auth/types/jwtPayload';
+import { AuthService } from '../auth.service';
 
 //this strategy will compare the hash of stored refresh token
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-  constructor(configService: ConfigService) {
+  private readonly logger = new Logger(RtStrategy.name);
+  constructor(configService: ConfigService, private authService: AuthService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          return request?.cookies.Refresh;
+        },
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('auth.rt_secret'),
       passReqToCallback: true,
     });
   }
 
-  async validate(req: Request, payload: JwtPayload) {
-    const refreshToken = req.get('authorization').replace('Bearer', '').trim();
-    return { ...payload, refreshToken };
+  async validate(req: Request, payload: JwtPayload): Promise<any> {
+    const refreshToken = req?.cookies?.Refresh;
+
+    if (!refreshToken) {
+      throw new BadRequestException('No Refresh Token');
+    }
+
+    this.logger.debug(`[RT Strategy] Midleware...`);
+    const user = await this.authService.validateRefreshToken(
+      payload.sub,
+      refreshToken,
+    );
+
+    if (!user) {
+      throw new BadRequestException();
+    }
+
+    return user;
   }
 }

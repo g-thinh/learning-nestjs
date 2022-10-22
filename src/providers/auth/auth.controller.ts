@@ -1,49 +1,81 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
-import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { LocalAuthGuard } from 'src/common/guards/local-auth.guard';
+import { AuthInterceptor } from 'src/common/interceptors/auth.interceptor';
+import { LogoutInterceptor } from 'src/common/interceptors/logout.interceptor';
+import { RefreshInterceptor } from 'src/common/interceptors/refresh.interceptor';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RtAuthGuard } from '../../common/guards/rt-auth.guard';
-import { Tokens } from './types';
+import { AuthService } from './auth.service';
+import { AuthDto } from './dto';
+import { PayloadDto } from './dto/payload.dto';
+import { RequestWithUser } from './types/requestWithUser';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiBody({ type: AuthDto })
+  @ApiOperation({
+    summary: 'Create a new user to authenticate with using the local strategy',
+  })
   @Post('/local/signup')
   @HttpCode(HttpStatus.CREATED)
-  signupLocal(@Body() authDto: AuthDto): Promise<Tokens> {
-    return this.authService.signupLocal(authDto);
+  async signupLocal(@Body() authDto: AuthDto) {
+    return await this.authService.signupLocal(authDto);
   }
 
+  @ApiBody({ type: AuthDto })
+  @ApiOperation({
+    summary: 'Authenticate user credentials using the local strategy',
+  })
+  @ApiOkResponse({
+    type: PayloadDto,
+    description: 'The user has been succesfully authenticated.',
+  })
+  @ApiBadRequestResponse({ description: 'User has invalid credentials' })
+  @UseGuards(LocalAuthGuard)
+  @UseInterceptors(RefreshInterceptor, AuthInterceptor)
+  @HttpCode(HttpStatus.OK)
   @Post('/local/signin')
-  @HttpCode(HttpStatus.OK)
-  signinLocal(@Body() authDto: AuthDto): Promise<Tokens> {
-    return this.authService.signinLocal(authDto);
+  async login(@Req() request: RequestWithUser) {
+    return request.user;
   }
 
+  @ApiCookieAuth('Authentication')
   @UseGuards(JwtAuthGuard)
-  @Get('/logout')
+  @Delete('/logout')
   @HttpCode(HttpStatus.OK)
-  logout(@GetCurrentUser('sub') userId: number): Promise<void> {
-    return this.authService.logout(userId);
+  @UseInterceptors(LogoutInterceptor)
+  async logout() {
+    return { message: 'User has successfully logged out' };
   }
 
+  @ApiCookieAuth('Refresh')
   @UseGuards(RtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
   @Get('/refresh')
   @HttpCode(HttpStatus.OK)
-  refreshTokens(
-    @GetCurrentUser('refreshToken') refreshToken: string,
-    @GetCurrentUser('sub') userId: number,
-  ): Promise<Tokens> {
-    return this.authService.refreshTokens(userId, refreshToken);
+  async refreshTokens(@Req() request: RequestWithUser) {
+    return request.user;
   }
 }

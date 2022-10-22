@@ -15,7 +15,7 @@ type PartialUser = Omit<User, 'hashedRt' | 'hashedPassword'>;
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOne(userId: number): Promise<PartialUser | null> {
+  async findOne(userId: number) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -24,11 +24,11 @@ export class UsersService {
 
     if (!user) throw new BadRequestException('User not found.');
 
-    return this.excludeUserHash(user);
+    return user;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    const user = await this.prisma.user.findUniqueOrThrow({
+  async findByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
       where: {
         email,
       },
@@ -95,6 +95,29 @@ export class UsersService {
     }
   }
 
+  async setRefreshToken(rt: string, userId: number) {
+    const hashedRefreshToken = await bcrypt.hash(rt, 10);
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hashedRt: hashedRefreshToken,
+      },
+    });
+  }
+
+  async removeRefreshToken(userId: number) {
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hashedRt: null,
+      },
+    });
+  }
+
   private excludeFields<User, Key extends keyof User>(
     user: User,
     ...keys: Key[]
@@ -105,7 +128,7 @@ export class UsersService {
     return user;
   }
 
-  private excludeUserHash(user: User): PartialUser {
+  excludeUserHash(user: User): PartialUser {
     return this.excludeFields(user, 'hashedPassword', 'hashedRt');
   }
 

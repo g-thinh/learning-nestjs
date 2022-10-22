@@ -6,31 +6,35 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-import { RequestService } from 'src/providers/request.service';
+import { RequestWithUser } from 'src/providers/auth/types/requestWithUser';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name);
-
-  constructor(private requestService: RequestService) {}
 
   intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const timeBeforeRouteHandle = Date.now();
-    const request = context.switchToHttp().getRequest();
+    const request: RequestWithUser = context.switchToHttp().getRequest();
     const userAgent = request.get('user-agent') || '';
     const { ip, method, path: url } = request;
-    const userId = this.requestService.getUserId();
+
+    const isAuthenticated = Boolean(request.user);
+    const { user } = request;
+    const userId = user?.id;
 
     this.logger.log(
       `[BEFORE] ${method} ${url} ${userAgent} ${ip}: ${
         context.getClass().name
       } ${context.getHandler().name}`,
     );
+
     this.logger.log(
-      `${userId ? 'Authenticated' : 'Un-authenticated'} userId: ${userId}`,
+      `${
+        isAuthenticated ? '[Authenticated]' : '[Un-authenticated]'
+      } - userId: ${userId}`,
     );
 
     return next.handle().pipe(

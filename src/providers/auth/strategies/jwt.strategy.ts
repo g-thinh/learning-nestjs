@@ -1,28 +1,37 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-
-export type JwtPayload = {
-  sub: string;
-  email: string;
-  iat?: number;
-  exp?: number;
-  refreshToken?: string;
-};
+import { UsersService } from 'src/providers/users/users.service';
+import { JwtPayload } from '../types/jwtPayload';
 
 //basically, this will destroy the token and create another
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(configService: ConfigService) {
+  constructor(
+    configService: ConfigService,
+    private readonly userService: UsersService,
+  ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          return request?.cookies.Authentication;
+        },
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('auth.secret'),
     });
   }
 
-  async validate(payload: JwtPayload): Promise<JwtPayload> {
-    return payload;
+  async validate(payload: JwtPayload): Promise<any> {
+    const user = this.userService.findOne(payload.sub);
+
+    if (!user) {
+      throw new BadRequestException();
+    }
+
+    return user;
   }
 }

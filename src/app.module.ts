@@ -9,7 +9,6 @@ import { dbConfig } from './config/db.config';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { PrismaModule } from './providers/prisma/prisma.module';
-import { RequestService } from './providers/request.service';
 import { UsersModule } from './providers/users/users.module';
 import { LoggerModule } from 'nestjs-pino';
 
@@ -41,7 +40,6 @@ import { LoggerModule } from 'nestjs-pino';
   controllers: [AppController],
   providers: [
     AppService,
-    RequestService,
     {
       provide: APP_INTERCEPTOR,
       scope: Scope.REQUEST,

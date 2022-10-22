@@ -1,17 +1,24 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersService } from './users.service';
 
+@ApiCookieAuth('Authentication')
+@ApiCookieAuth('Refresh')
+@ApiTags('Users')
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
