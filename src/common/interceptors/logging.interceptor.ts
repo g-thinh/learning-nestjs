@@ -8,6 +8,13 @@ import {
 import { Observable, tap } from 'rxjs';
 import { RequestWithUser } from 'src/providers/auth/types/requestWithUser';
 
+/**
+ * Interceptor for logging user-agent and request metadata.
+ *
+ * @remarks
+ * Verifies if the request is authenticated.
+ *
+ */
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name);

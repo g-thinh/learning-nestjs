@@ -72,7 +72,7 @@ export class AuthController {
 
   @ApiCookieAuth('Refresh')
   @UseGuards(RtAuthGuard)
-  @UseInterceptors(AuthInterceptor)
+  @UseInterceptors(RefreshInterceptor, AuthInterceptor)
   @Get('/refresh')
   @HttpCode(HttpStatus.OK)
   async refreshTokens(@Req() request: RequestWithUser) {

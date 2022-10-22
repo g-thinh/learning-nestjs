@@ -12,10 +12,13 @@ import { AuthService } from 'src/providers/auth/auth.service';
 import { RequestWithUser } from 'src/providers/auth/types/requestWithUser';
 import { UsersService } from 'src/providers/users/users.service';
 
-/*
- * write a good comment here
+/**
+ * Interceptor for removing authentication related cookies in the request header.
+ *
+ * @remarks
+ * Calls the `logout()` method to delete the `user` object in the request. Learn more {@Link https://www.passportjs.org/concepts/authentication/logout/ here}.
+ *
  */
-
 @Injectable()
 export class LogoutInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LogoutInterceptor.name);

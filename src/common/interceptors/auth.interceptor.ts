@@ -11,8 +11,17 @@ import { Observable } from 'rxjs';
 import { AuthService } from 'src/providers/auth/auth.service';
 import { RequestWithUser } from 'src/providers/auth/types/requestWithUser';
 
-// this is where I want to set cookie headers based on passport.js
-// giving me back a user in my request.
+/**
+ * Interceptor for adding the access token in a cookie header.
+ * Modifies the `user` object in the request to be the JWT payload.
+ *
+ * @remarks
+ * Also appends the refresh token if it was previously added.
+ *
+ * @remarks
+ * This interceptor should be used AFTER the Refresh interceptor.
+ *
+ */
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
   private readonly logger = new Logger(AuthInterceptor.name);

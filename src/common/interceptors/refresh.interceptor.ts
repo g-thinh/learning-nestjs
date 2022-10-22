@@ -11,8 +11,9 @@ import { AuthService } from 'src/providers/auth/auth.service';
 import { RequestWithUser } from 'src/providers/auth/types/requestWithUser';
 import { UsersService } from 'src/providers/users/users.service';
 
-// this is where I want to set cookie headers based on passport.js
-// giving me back a user in my request.
+/**
+ * Interceptor for adding the refresh token in a cookie header.
+ */
 @Injectable()
 export class RefreshInterceptor implements NestInterceptor {
   private readonly logger = new Logger(RefreshInterceptor.name);

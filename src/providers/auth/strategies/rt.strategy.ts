@@ -6,7 +6,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from 'src/providers/auth/types/jwtPayload';
 import { AuthService } from '../auth.service';
 
-//this strategy will compare the hash of stored refresh token
+/**
+ * Middleware for validating the refresh token found in a cookie header and
+ * returning the user to the `request` object.
+ *
+ */
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   private readonly logger = new Logger(RtStrategy.name);

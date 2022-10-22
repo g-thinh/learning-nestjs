@@ -6,7 +6,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from 'src/providers/users/users.service';
 import { JwtPayload } from '../types/jwtPayload';
 
-//basically, this will destroy the token and create another
+/**
+ * Middleware for validating the JWT access token found in a cookie header and
+ * appends the `user` to the `request`.
+ *
+ */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(

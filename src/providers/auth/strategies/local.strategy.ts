@@ -1,10 +1,15 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { AuthService } from '../auth.service';
 
-//This middleware will validate my authentication credentials and pass
-//a user object to the request. Next stop is the Guard.
+/**
+ * Middleware for validating authentication crendentials in request body and
+ * returning the user to the `request` object.
+ *
+ * @remarks
+ * `username` has been renamed to `email` in the `constructor`
+ */
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   private readonly logger = new Logger(LocalStrategy.name);
@@ -16,12 +21,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(email: string, password: string) {
-    console.log('validating', email, password);
     const user = await this.authService.validateUser(email, password);
-
-    if (!user) {
-      throw new UnauthorizedException('unable to validate user');
-    }
 
     this.logger.debug('[LOCAL STRATEGY] Middleware...');
     return user;
